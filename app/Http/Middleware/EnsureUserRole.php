@@ -16,9 +16,8 @@ class EnsureUserRole
             return redirect()->route('company.login');
         }
 
-        if (! in_array($user->role, $roles, true)) {
-            abort(403);
-        }
+        if (! in_array($user->role, $roles, true)) abort(403);
+        
 
         return $next($request);
     }

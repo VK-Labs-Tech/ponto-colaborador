@@ -7,6 +7,7 @@ use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\TimePunchRepositoryInterface;
 use App\Services\AuditLogService;
 use App\Services\MonthlyClosureService;
+use App\Support\PinHasher;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 
@@ -20,7 +21,7 @@ class TimeTrackingService
     ) {
     }
 
-    public function registerPunch(int $companyId, int $employeeId, string $pin, string $action): TimePunch
+    public function registerPunch(int $companyId, int $employeeId, string $pin): TimePunch
     {
         $employee = $this->employeeRepository->findById($employeeId);
 
@@ -30,10 +31,14 @@ class TimeTrackingService
             ]);
         }
 
-        if ($employee->pin !== $pin) {
+        if (! PinHasher::verify($pin, (string) $employee->pin)) {
             throw ValidationException::withMessages([
                 'pin' => 'PIN invalido.',
             ]);
+        }
+
+        if (PinHasher::needsUpgrade((string) $employee->pin)) {
+            $this->employeeRepository->updatePin($employee->id, PinHasher::hash($pin));
         }
 
         $now = Carbon::now();
@@ -42,6 +47,15 @@ class TimeTrackingService
                 'date' => 'Nao e permitido lancar ponto em mes fechado.',
             ]);
         }
+
+        $todayPunches = $this->timePunchRepository->listByEmployeePeriod(
+            employeeId: $employee->id,
+            from: $now->copy()->startOfDay(),
+            to: $now->copy()->endOfDay()
+        );
+
+        $lastPunch = $todayPunches->last();
+        $action = $lastPunch?->action === 'in' ? 'out' : 'in';
 
         $punch = $this->timePunchRepository->create([
             'company_id' => $companyId,

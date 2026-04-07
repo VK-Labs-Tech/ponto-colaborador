@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use App\Support\PinHasher;
 use Illuminate\Support\Collection;
 
 class EmployeeService
@@ -24,7 +25,7 @@ class EmployeeService
             'company_id' => $companyId,
             'name' => $data['name'],
             'registration' => $data['registration'] ?? null,
-            'pin' => $data['pin'],
+            'pin' => PinHasher::hash((string) $data['pin']),
             'shift_start' => $data['shift_start'],
             'shift_end' => $data['shift_end'],
             'is_active' => (bool) ($data['is_active'] ?? true),

@@ -136,5 +136,13 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            const nav = performance.getEntriesByType('navigation')[0];
+            if (event.persisted || nav?.type === 'back_forward') {
+                window.location.reload();
+            }
+        });
+    </script>
 </body>
 </html>

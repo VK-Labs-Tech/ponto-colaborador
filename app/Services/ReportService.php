@@ -24,6 +24,31 @@ class ReportService
             return $punch->employee_id.'|'.$punch->punched_at->toDateString();
         });
 
+        $punchRows = $punches
+            ->sortBy('punched_at')
+            ->values()
+            ->map(function ($punch) {
+                $isLate = false;
+
+                if ($punch->action === 'in' && $punch->employee?->shift_start) {
+                    $shiftStart = Carbon::parse(
+                        $punch->punched_at->toDateString().' '.$punch->employee->shift_start->format('H:i:s')
+                    );
+                    $isLate = $punch->punched_at->greaterThan($shiftStart);
+                }
+
+                return [
+                    'employee_id' => $punch->employee_id,
+                    'employee_name' => $punch->employee?->name ?? 'N/A',
+                    'date' => $punch->punched_at->toDateString(),
+                    'time' => $punch->punched_at->format('H:i'),
+                    'action' => $punch->action,
+                    'action_label' => $punch->action === 'in' ? 'Entrada' : 'Saida',
+                    'is_late' => $isLate,
+                ];
+            })
+            ->all();
+
         $rows = [];
         $totalWorked = 0;
         $totalOvertime = 0;
@@ -72,6 +97,7 @@ class ReportService
 
         return [
             'rows' => $rows,
+            'punch_rows' => $punchRows,
             'totals' => [
                 'worked_minutes' => $totalWorked,
                 'worked_hours' => $this->minutesToHuman($totalWorked),

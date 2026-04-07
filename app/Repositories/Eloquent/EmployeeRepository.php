@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Employee;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use App\Support\PinHasher;
 use Illuminate\Support\Collection;
 
 class EmployeeRepository implements EmployeeRepositoryInterface
@@ -17,7 +18,7 @@ class EmployeeRepository implements EmployeeRepositoryInterface
     {
         return Employee::query()
             ->where('company_id', $companyId)
-            ->where('pin', $pin)
+            ->whereIn('pin', [PinHasher::hash($pin), trim($pin)])
             ->where('is_active', true)
             ->first();
     }
@@ -42,5 +43,12 @@ class EmployeeRepository implements EmployeeRepositoryInterface
     public function create(array $data): Employee
     {
         return Employee::query()->create($data);
+    }
+
+    public function updatePin(int $employeeId, string $pin): void
+    {
+        Employee::query()
+            ->whereKey($employeeId)
+            ->update(['pin' => $pin]);
     }
 }

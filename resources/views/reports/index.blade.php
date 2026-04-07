@@ -27,12 +27,8 @@
                     <tr>
                         <th>Colaborador</th>
                         <th>Data</th>
-                        <th>Entrada 1</th>
-                        <th>Saida 1</th>
-                        <th>Entrada 2</th>
-                        <th>Saida 2</th>
-                        <th>Total de horas</th>
-                        <th>Horas extras</th>
+                        <th>Hora</th>
+                        <th>Acao</th>
                         <th>Atraso</th>
                         @if($canAdjustPunch)
                             <th>Acoes</th>
@@ -40,16 +36,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($report['rows'] as $row)
+                    @forelse($report['punch_rows'] as $row)
                         <tr>
                             <td>{{ $row['employee_name'] }}</td>
                             <td>{{ \Carbon\Carbon::parse($row['date'])->format('d/m/Y') }}</td>
-                            <td>{{ $row['entry_1'] }}</td>
-                            <td>{{ $row['exit_1'] }}</td>
-                            <td>{{ $row['entry_2'] }}</td>
-                            <td>{{ $row['exit_2'] }}</td>
-                            <td>{{ $row['worked_hours'] }}</td>
-                            <td>{{ $row['overtime_hours'] }}</td>
+                            <td>{{ $row['time'] }}</td>
+                            <td>{{ $row['action_label'] }}</td>
                             <td>
                                 @if($row['is_late'])
                                     <span class="badge text-bg-warning">Sim</span>
@@ -60,14 +52,14 @@
                             @if($canAdjustPunch)
                                 <td>
                                     <a class="btn btn-sm btn-outline-brand" href="{{ route('reports.adjust.edit', ['employee_id' => $row['employee_id'], 'date' => $row['date']]) }}">
-                                        Ajustar
+                                        Ajustar dia
                                     </a>
                                 </td>
                             @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $canAdjustPunch ? 10 : 9 }}" class="text-center text-muted">Nenhum registro encontrado para o filtro informado.</td>
+                            <td colspan="{{ $canAdjustPunch ? 6 : 5 }}" class="text-center text-muted">Nenhum registro encontrado para o filtro informado.</td>
                         </tr>
                     @endforelse
                 </tbody>

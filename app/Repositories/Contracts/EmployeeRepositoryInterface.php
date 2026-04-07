@@ -16,4 +16,6 @@ interface EmployeeRepositoryInterface
     public function listByCompany(int $companyId): Collection;
 
     public function create(array $data): Employee;
+
+    public function updatePin(int $employeeId, string $pin): void;
 }

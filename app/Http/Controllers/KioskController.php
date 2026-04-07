@@ -28,18 +28,18 @@ class KioskController extends Controller
         $validated = $request->validate([
             'employee_id' => ['required', 'integer'],
             'pin' => ['required', 'string', 'min:4', 'max:10'],
-            'action' => ['required', 'in:in,out'],
         ]);
 
         $companyId = (int) session('company_id');
 
-        $this->timeTrackingService->registerPunch(
+        $punch = $this->timeTrackingService->registerPunch(
             companyId: $companyId,
             employeeId: (int) $validated['employee_id'],
-            pin: (string) $validated['pin'],
-            action: (string) $validated['action']
+            pin: (string) $validated['pin']
         );
 
-        return redirect()->route('kiosk.index')->with('status', 'Ponto registrado com sucesso.');
+        $actionLabel = $punch->action === 'in' ? 'Entrada' : 'Saida';
+
+        return redirect()->route('kiosk.index')->with('status', $actionLabel . ' registrada com sucesso.');
     }
 }

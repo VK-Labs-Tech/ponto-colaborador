@@ -1,7 +1,7 @@
 <x-layouts.app title="Usuarios da Empresa">
     <x-page-header
         title="Usuarios da empresa"
-        subtitle="Crie usuarios para operar e ajustar batidas dos colaboradores"
+        subtitle="Crie usuarios com perfis de administrador, editor e operador"
     />
 
     <div class="row g-4">
@@ -31,6 +31,7 @@
                         <div class="col-12">
                             <label class="form-label">Perfil</label>
                             <select class="form-select" name="role" required>
+                                <option value="company_operator">Operador (Bater ponto + Relatorios)</option>
                                 <option value="company_editor">Editor de ponto</option>
                                 <option value="company_admin">Administrador da empresa</option>
                             </select>
@@ -67,6 +68,8 @@
                                     <td>
                                         @if($user->role === 'company_admin')
                                             <span class="badge text-bg-primary">Administrador</span>
+                                        @elseif($user->role === 'company_operator')
+                                            <span class="badge text-bg-success">Operador</span>
                                         @else
                                             <span class="badge text-bg-warning">Editor de ponto</span>
                                         @endif

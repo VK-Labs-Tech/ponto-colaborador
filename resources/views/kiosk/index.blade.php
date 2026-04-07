@@ -1,7 +1,7 @@
 <x-layouts.app title="Bater ponto">
     <x-page-header
         title="Bater ponto"
-        subtitle="Selecione o colaborador, informe o PIN e registre entrada ou saida"
+        subtitle="Selecione o colaborador, informe o PIN e registre a batida"
     />
 
     <section class="surface-card p-4 mb-4">
@@ -23,14 +23,6 @@
             <div class="col-12 col-md-3">
                 <label class="form-label">PIN</label>
                 <input class="form-control" type="password" name="pin" inputmode="numeric" required>
-            </div>
-
-            <div class="col-12 col-md-2">
-                <label class="form-label">Acao</label>
-                <select class="form-select" name="action" required>
-                    <option value="in">Entrada</option>
-                    <option value="out">Saida</option>
-                </select>
             </div>
 
             <div class="col-12 col-md-2 d-grid">

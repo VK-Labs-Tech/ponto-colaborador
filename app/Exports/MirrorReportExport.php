@@ -16,12 +16,8 @@ class MirrorReportExport implements FromArray, WithHeadings
         return array_map(fn (array $row) => [
             $row['employee_name'],
             $row['date'],
-            $row['entry_1'],
-            $row['exit_1'],
-            $row['entry_2'],
-            $row['exit_2'],
-            $row['worked_hours'],
-            $row['overtime_hours'],
+            $row['time'],
+            $row['action_label'],
             $row['is_late'] ? 'Sim' : 'Nao',
         ], $this->rows);
     }
@@ -31,12 +27,8 @@ class MirrorReportExport implements FromArray, WithHeadings
         return [
             'Colaborador',
             'Data',
-            'Entrada 1',
-            'Saida 1',
-            'Entrada 2',
-            'Saida 2',
-            'Horas Trabalhadas',
-            'Horas Extras',
+            'Hora',
+            'Acao',
             'Atraso',
         ];
     }

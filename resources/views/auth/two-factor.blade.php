@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login da Empresa</title>
+    <title>Verificacao 2FA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
         }
 
         .auth-card {
-            width: min(490px, 92vw);
+            width: min(500px, 92vw);
             border-radius: 1.25rem;
             background: rgba(255, 255, 255, 0.96);
             box-shadow: 0 18px 46px rgba(0, 0, 0, .32);
@@ -45,25 +45,25 @@
 </head>
 <body>
     <section class="auth-card p-4 p-md-5">
-        <span class="pill mb-3"><i class="bi bi-shield-lock"></i> Acesso ADM/EMPRESA</span>
-        <h1 class="h3 mb-1 fw-bold">Ponto Colaborador</h1>
-        <p class="text-muted mb-4">Use seu usuario para acessar o sistema</p>
+        <span class="pill mb-3"><i class="bi bi-shield-check"></i> Verificacao em duas etapas</span>
+        <h1 class="h4 mb-1 fw-bold">Confirme seu acesso</h1>
+        <p class="text-muted mb-4">Digite o codigo de 6 digitos enviado para o e-mail do administrador.</p>
 
         <x-flash />
 
-        <form action="{{ route('company.login.submit') }}" method="POST" class="d-grid gap-3">
+        <form action="{{ route('company.2fa.verify') }}" method="POST" class="d-grid gap-3 mb-3">
             @csrf
             <div>
-                <label class="form-label">E-mail ou nome do usuario</label>
-                <input class="form-control" type="text" name="login" value="{{ old('login') }}" required>
+                <label class="form-label">Codigo 2FA</label>
+                <input class="form-control" type="text" name="code" inputmode="numeric" maxlength="6" placeholder="000000" required>
             </div>
 
-            <div>
-                <label class="form-label">Senha</label>
-                <input class="form-control" type="password" name="password" required>
-            </div>
+            <button class="btn btn-warning fw-bold" type="submit">Validar codigo</button>
+        </form>
 
-            <button class="btn btn-warning fw-bold" type="submit">Entrar</button>
+        <form action="{{ route('company.2fa.resend') }}" method="POST" class="d-grid">
+            @csrf
+            <button class="btn btn-outline-secondary" type="submit">Reenviar codigo</button>
         </form>
     </section>
 

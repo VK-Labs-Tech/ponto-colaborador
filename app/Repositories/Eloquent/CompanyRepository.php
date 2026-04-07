@@ -23,7 +23,10 @@ class CompanyRepository implements CompanyRepositoryInterface
 
     public function listAll(): Collection
     {
-        return Company::query()->orderBy('name')->get();
+        return Company::query()
+            ->with('subscription.plan')
+            ->orderBy('name')
+            ->get();
     }
 
     public function create(array $data): Company

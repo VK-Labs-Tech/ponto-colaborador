@@ -21,12 +21,8 @@
             <tr>
                 <th>Colaborador</th>
                 <th>Data</th>
-                <th>Entrada 1</th>
-                <th>Saida 1</th>
-                <th>Entrada 2</th>
-                <th>Saida 2</th>
-                <th>Total</th>
-                <th>Extras</th>
+                <th>Hora</th>
+                <th>Acao</th>
                 <th>Atraso</th>
             </tr>
         </thead>
@@ -35,12 +31,8 @@
                 <tr>
                     <td>{{ $row['employee_name'] }}</td>
                     <td>{{ \Carbon\Carbon::parse($row['date'])->format('d/m/Y') }}</td>
-                    <td>{{ $row['entry_1'] }}</td>
-                    <td>{{ $row['exit_1'] }}</td>
-                    <td>{{ $row['entry_2'] }}</td>
-                    <td>{{ $row['exit_2'] }}</td>
-                    <td>{{ $row['worked_hours'] }}</td>
-                    <td>{{ $row['overtime_hours'] }}</td>
+                    <td>{{ $row['time'] }}</td>
+                    <td>{{ $row['action_label'] }}</td>
                     <td>{{ $row['is_late'] ? 'Sim' : 'Nao' }}</td>
                 </tr>
             @endforeach

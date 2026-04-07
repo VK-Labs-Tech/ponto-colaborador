@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Services\EmployeeService;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class EmployeeController extends Controller
 {
-    public function __construct(private readonly EmployeeService $employeeService)
-    {
+    public function __construct(
+        private readonly EmployeeService $employeeService,
+        private readonly SubscriptionService $subscriptionService
+    ) {
     }
 
     public function index()
@@ -25,6 +29,12 @@ class EmployeeController extends Controller
     {
         $companyId = (int) session('company_id');
 
+        if (! $this->subscriptionService->ensureCanCreateEmployee($companyId)) {
+            throw ValidationException::withMessages([
+                'name' => 'Limite de colaboradores do plano atingido.',
+            ]);
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:3', 'max:120'],
             'registration' => [
@@ -33,7 +43,7 @@ class EmployeeController extends Controller
                 'max:40',
                 Rule::unique('employees', 'registration')->where(fn ($query) => $query->where('company_id', $companyId)),
             ],
-            'pin' => ['required', 'string', 'min:4', 'max:10'],
+            'pin' => ['required', 'regex:/^\d{4,10}$/'],
             'shift_start' => ['required', 'date_format:H:i'],
             'shift_end' => ['required', 'date_format:H:i'],
             'is_active' => ['nullable', 'boolean'],

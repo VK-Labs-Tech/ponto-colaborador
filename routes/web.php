@@ -16,7 +16,14 @@ Route::redirect('/', '/login');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [CompanyAuthController::class, 'showLogin'])->name('company.login');
     Route::get('/auth/login', fn () => redirect()->route('company.login'))->name('login');
-    Route::post('/login', [CompanyAuthController::class, 'login'])->name('company.login.submit');
+    Route::post('/login', [CompanyAuthController::class, 'login'])->middleware('throttle:login')->name('company.login.submit');
+    Route::get('/2fa', [CompanyAuthController::class, 'showTwoFactor'])->name('company.2fa.form');
+    Route::post('/2fa', [CompanyAuthController::class, 'verifyTwoFactor'])
+        ->middleware('throttle:2fa-verify')
+        ->name('company.2fa.verify');
+    Route::post('/2fa/resend', [CompanyAuthController::class, 'resendTwoFactor'])
+        ->middleware('throttle:2fa-resend')
+        ->name('company.2fa.resend');
 });
 
 Route::middleware('auth')->group(function () {
@@ -25,27 +32,49 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'role:saas_admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/companies', [CompanyManagementController::class, 'index'])->name('companies.index');
+    Route::get('/companies/{companyId}', [CompanyManagementController::class, 'show'])->name('companies.show');
     Route::post('/companies', [CompanyManagementController::class, 'store'])->name('companies.store');
+    Route::post('/companies/{companyId}/subscription', [CompanyManagementController::class, 'updateSubscription'])
+        ->name('companies.subscription.update');
 });
 
 Route::middleware(['auth', 'company.auth'])->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware('role:company_admin,company_editor')
+        ->name('dashboard.index');
 
-    Route::get('/kiosk', [KioskController::class, 'index'])->name('kiosk.index');
-    Route::post('/kiosk/punch', [KioskController::class, 'store'])->name('kiosk.punch');
+    Route::get('/kiosk', [KioskController::class, 'index'])
+        ->middleware('role:company_admin,company_operator')
+        ->name('kiosk.index');
+    Route::post('/kiosk/punch', [KioskController::class, 'store'])
+        ->middleware('throttle:kiosk-punch')
+        ->middleware('role:company_admin,company_operator')
+        ->name('kiosk.punch');
 
-    Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
-    Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+    Route::get('/employees', [EmployeeController::class, 'index'])
+        ->middleware('role:company_admin')
+        ->name('employees.index');
+    Route::post('/employees', [EmployeeController::class, 'store'])
+        ->middleware('role:company_admin')
+        ->name('employees.store');
 
-    Route::get('/company-users', [CompanyUserController::class, 'index'])->name('company-users.index');
+    Route::get('/company-users', [CompanyUserController::class, 'index'])
+        ->middleware('role:company_admin')
+        ->name('company-users.index');
     Route::post('/company-users', [CompanyUserController::class, 'store'])
         ->middleware('role:company_admin')
         ->name('company-users.store');
 
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
-    Route::get('/reports/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
+    Route::get('/reports', [ReportController::class, 'index'])
+        ->middleware('role:company_admin,company_editor,company_operator')
+        ->name('reports.index');
+    Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])
+        ->middleware('role:company_admin,company_editor,company_operator')
+        ->name('reports.export.pdf');
+    Route::get('/reports/export/excel', [ReportController::class, 'exportExcel'])
+        ->middleware('role:company_admin,company_editor,company_operator')
+        ->name('reports.export.excel');
     Route::get('/reports/adjust', [TimePunchAdjustmentController::class, 'edit'])
         ->middleware('role:company_editor')
         ->name('reports.adjust.edit');
@@ -53,5 +82,7 @@ Route::middleware(['auth', 'company.auth'])->group(function () {
         ->middleware('role:company_editor')
         ->name('reports.adjust.update');
 
-    Route::post('/monthly-closures', [MonthlyClosureController::class, 'store'])->name('monthly-closures.store');
+    Route::post('/monthly-closures', [MonthlyClosureController::class, 'store'])
+        ->middleware('role:company_admin')
+        ->name('monthly-closures.store');
 });
