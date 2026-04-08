@@ -128,6 +128,11 @@
     </style>
 </head>
 <body>
+    @php
+        $introVideos = config('app.intro_videos', []);
+        $showIntroVideos = session('show_intro_videos') && count($introVideos) > 0;
+    @endphp
+
     <x-navbar />
 
     <main class="container py-4 page-enter">
@@ -136,6 +141,43 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @if($showIntroVideos)
+        <div class="modal fade" id="introVideosModal" tabindex="-1" aria-labelledby="introVideosModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content" style="border-radius: 1rem;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="introVideosModalLabel">Bem-vindo! Veja esta introducao rapida</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            @foreach($introVideos as $videoUrl)
+                                <div class="col-12 col-lg-6">
+                                    @if(\Illuminate\Support\Str::endsWith(\Illuminate\Support\Str::lower($videoUrl), ['.mp4', '.webm', '.ogg', '.m4v', '.mov']))
+                                        <video controls preload="metadata" class="w-100 rounded-3 border" style="background:#000;">
+                                            <source src="{{ $videoUrl }}">
+                                            Seu navegador nao suporta video HTML5.
+                                        </video>
+                                    @else
+                                        <div class="ratio ratio-16x9">
+                                            <iframe
+                                                class="rounded-3 border"
+                                                src="{{ $videoUrl }}"
+                                                title="Video de introducao"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                referrerpolicy="strict-origin-when-cross-origin"
+                                                allowfullscreen>
+                                            </iframe>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
     <script>
         window.addEventListener('pageshow', function (event) {
             const nav = performance.getEntriesByType('navigation')[0];
@@ -143,6 +185,20 @@
                 window.location.reload();
             }
         });
+
+        @if($showIntroVideos)
+        window.addEventListener('DOMContentLoaded', function () {
+            const modalEl = document.getElementById('introVideosModal');
+            if (!modalEl) return;
+
+            const modal = new bootstrap.Modal(modalEl, {
+                backdrop: 'static',
+                keyboard: true,
+            });
+
+            modal.show();
+        });
+        @endif
     </script>
 </body>
 </html>

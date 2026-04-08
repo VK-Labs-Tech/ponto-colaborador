@@ -86,6 +86,7 @@ class CompanyAuthController extends Controller
 
         $request->session()->put('company_id', $user->company_id);
         $request->session()->put('company_name', $user->company?->name ?? 'Empresa');
+        $request->session()->flash('show_intro_videos', true);
 
         if ($user->role === 'company_operator') {
             return redirect()->route('kiosk.index');
@@ -137,6 +138,7 @@ class CompanyAuthController extends Controller
         $request->session()->regenerate();
 
         Auth::login($user);
+        $request->session()->flash('show_intro_videos', true);
 
         return redirect()->route('admin.companies.index');
     }

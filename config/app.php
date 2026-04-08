@@ -56,6 +56,11 @@ return [
 
     'force_https' => env('FORCE_HTTPS', false),
 
+    'intro_videos' => array_values(array_filter([
+        env('INTRO_VIDEO_1_URL'),
+        env('INTRO_VIDEO_2_URL'),
+    ])),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
