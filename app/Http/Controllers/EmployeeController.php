@@ -45,6 +45,8 @@ class EmployeeController extends Controller
             ],
             'pin' => ['required', 'regex:/^\d{4,10}$/'],
             'shift_start' => ['required', 'date_format:H:i'],
+            'lunch_start' => ['required', 'date_format:H:i'],
+            'lunch_end' => ['required', 'date_format:H:i'],
             'shift_end' => ['required', 'date_format:H:i'],
             'is_active' => ['nullable', 'boolean'],
         ]);

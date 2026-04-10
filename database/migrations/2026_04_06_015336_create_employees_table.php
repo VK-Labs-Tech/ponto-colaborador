@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('registration')->nullable();
             $table->string('pin');
             $table->time('shift_start')->default('08:00:00');
+            $table->time('lunch_start')->default('12:00:00');
+            $table->time('lunch_end')->default('13:00:00');
             $table->time('shift_end')->default('17:00:00');
             $table->boolean('is_active')->default(true);
             $table->timestamps();

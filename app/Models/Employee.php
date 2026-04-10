@@ -14,6 +14,8 @@ class Employee extends Model
         'registration',
         'pin',
         'shift_start',
+        'lunch_start',
+        'lunch_end',
         'shift_end',
         'is_active',
     ];
@@ -27,6 +29,8 @@ class Employee extends Model
         return [
             'is_active' => 'boolean',
             'shift_start' => 'datetime:H:i:s',
+            'lunch_start' => 'datetime:H:i:s',
+            'lunch_end' => 'datetime:H:i:s',
             'shift_end' => 'datetime:H:i:s',
         ];
     }

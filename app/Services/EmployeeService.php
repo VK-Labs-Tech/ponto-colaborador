@@ -27,6 +27,8 @@ class EmployeeService
             'registration' => $data['registration'] ?? null,
             'pin' => PinHasher::hash((string) $data['pin']),
             'shift_start' => $data['shift_start'],
+            'lunch_start' => $data['lunch_start'],
+            'lunch_end' => $data['lunch_end'],
             'shift_end' => $data['shift_end'],
             'is_active' => (bool) ($data['is_active'] ?? true),
         ]);
@@ -40,6 +42,10 @@ class EmployeeService
             payload: [
                 'name' => $employee->name,
                 'registration' => $employee->registration,
+                'shift_start' => $employee->shift_start,
+                'lunch_start' => $employee->lunch_start,
+                'lunch_end' => $employee->lunch_end,
+                'shift_end' => $employee->shift_end,
             ]
         );
     }
