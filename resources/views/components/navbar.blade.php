@@ -1,82 +1,50 @@
-<nav class="navbar navbar-expand-lg border-bottom sticky-top surface-glass">
+<nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top rounded-4 mt-2 mx-2 px-3">
     <div class="container">
-        @php
-            $homeRoute = 'dashboard.index';
-            if (auth()->check() && auth()->user()->role === 'company_operator') {
-                $homeRoute = 'kiosk.index';
-            }
-            if (auth()->check() && auth()->user()->role === 'saas_admin') {
-                $homeRoute = 'admin.companies.index';
-            }
-        @endphp
 
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ route($homeRoute) }}">
-            <span class="px-2 py-1 rounded-2" style="background:#fff7ed;color:#9a3412;"><i class="bi bi-clock-history"></i></span>
-            <span>Ponto Colaborador</span>
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="{{ route('dashboard.index') }}">
+            <div class="brand-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <span>Ponto</span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuApp" aria-controls="menuApp" aria-expanded="false" aria-label="Abrir menu">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuApp">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="menuApp">
-            @if(auth()->check())
-                @if(auth()->user()->role === 'saas_admin')
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-1">
-                        <li class="nav-item"><a class="nav-link" href="{{ route('admin.companies.index') }}">Empresas</a></li>
-                    </ul>
 
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="chip-soft"><i class="bi bi-person-badge"></i> ADM SaaS</span>
-                        <form method="POST" action="{{ route('company.logout') }}">
-                            @csrf
-                            <button class="btn btn-sm btn-outline-danger rounded-3" type="submit">Sair</button>
-                        </form>
-                    </div>
-                @elseif(auth()->user()->role === 'company_admin')
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-1">
-                        <li class="nav-item"><a class="nav-link" href="{{ route('dashboard.index') }}">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('kiosk.index') }}">Bater ponto</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('employees.index') }}">Funcionarios</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('company-users.index') }}">Usuarios</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('reports.index') }}">Relatorios</a></li>
-                    </ul>
+            @auth
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="chip-soft"><i class="bi bi-buildings"></i> {{ session('company_name') }}</span>
-                        <form method="POST" action="{{ route('company.logout') }}">
-                            @csrf
-                            <button class="btn btn-sm btn-outline-danger rounded-3" type="submit">Sair</button>
-                        </form>
-                    </div>
-                @elseif(auth()->user()->role === 'company_editor')
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-1">
-                        <li class="nav-item"><a class="nav-link" href="{{ route('dashboard.index') }}">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('reports.index') }}">Relatorios</a></li>
-                    </ul>
+                    @foreach(config('menu')[auth()->user()->role] ?? [] as $item)
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs($item['route']) ? 'active fw-semibold text-white bg-primary rounded-3 px-3' : '' }}"
+                                href="{{ route($item['route']) }}">
 
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="chip-soft"><i class="bi bi-pencil-square"></i> Editor de ponto</span>
-                        <form method="POST" action="{{ route('company.logout') }}">
-                            @csrf
-                            <button class="btn btn-sm btn-outline-danger rounded-3" type="submit">Sair</button>
-                        </form>
-                    </div>
-                @elseif(auth()->user()->role === 'company_operator')
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-1">
-                        <li class="nav-item"><a class="nav-link" href="{{ route('kiosk.index') }}">Bater ponto</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('reports.index') }}">Relatorios</a></li>
-                    </ul>
+                                <i class="bi {{ $item['icon'] }} me-1"></i>
+                                {{ $item['label'] }}
+                            </a>
+                        </li>
+                    @endforeach
 
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="chip-soft"><i class="bi bi-person-workspace"></i> Operador</span>
-                        <form method="POST" action="{{ route('company.logout') }}">
-                            @csrf
-                            <button class="btn btn-sm btn-outline-danger rounded-3" type="submit">Sair</button>
-                        </form>
+                </ul>
+
+                {{-- Usuário --}}
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-none d-md-flex flex-column text-start">
+                        <small class="fw-semibold">{{ auth()->user()->name }}</small>
+                        <small class="text-muted">{{ auth()->user()->role }}</small>
                     </div>
-                @endif
-            @endif
+                    <form method="POST" action="{{ route('company.logout') }}">
+                        @csrf
+                        <button class="dropdown-item text-danger btn:hover:bg-red-500" type="submit">
+                            <i class="bi bi-box-arrow-right me-2"></i> Sair
+                        </button>
+                    </form>
+                </div>
+            @endauth
+
         </div>
     </div>
 </nav>

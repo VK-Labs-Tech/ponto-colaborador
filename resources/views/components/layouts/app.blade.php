@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Ponto Colaborador' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -22,11 +24,6 @@
 
         body {
             font-family: 'Manrope', sans-serif;
-            background: radial-gradient(circle at 10% 6%, #fde68a 0%, transparent 30%),
-                        radial-gradient(circle at 92% 8%, #bae6fd 0%, transparent 30%),
-                        radial-gradient(circle at 20% 88%, #fecdd3 0%, transparent 36%),
-                        linear-gradient(180deg, #fff 0%, #f8f5f1 100%),
-                        var(--brand-bg);
             min-height: 100vh;
             color: var(--brand-text);
         }
@@ -39,8 +36,9 @@
         }
 
         .surface-glass {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.74);
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .btn-brand {
@@ -116,8 +114,15 @@
         }
 
         @keyframes rise-in {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @media (max-width: 768px) {
@@ -127,6 +132,7 @@
         }
     </style>
 </head>
+
 <body>
     @php
         $introVideos = config('app.intro_videos', []);
@@ -142,7 +148,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @if($showIntroVideos)
-        <div class="modal fade" id="introVideosModal" tabindex="-1" aria-labelledby="introVideosModalLabel" aria-hidden="true">
+        <div class="modal fade" id="introVideosModal" tabindex="-1" aria-labelledby="introVideosModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content" style="border-radius: 1rem;">
                     <div class="modal-header">
@@ -160,13 +167,9 @@
                                         </video>
                                     @else
                                         <div class="ratio ratio-16x9">
-                                            <iframe
-                                                class="rounded-3 border"
-                                                src="{{ $videoUrl }}"
-                                                title="Video de introducao"
+                                            <iframe class="rounded-3 border" src="{{ $videoUrl }}" title="Video de introducao"
                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                referrerpolicy="strict-origin-when-cross-origin"
-                                                allowfullscreen>
+                                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
                                             </iframe>
                                         </div>
                                     @endif
@@ -187,18 +190,19 @@
         });
 
         @if($showIntroVideos)
-        window.addEventListener('DOMContentLoaded', function () {
-            const modalEl = document.getElementById('introVideosModal');
-            if (!modalEl) return;
+            window.addEventListener('DOMContentLoaded', function () {
+                const modalEl = document.getElementById('introVideosModal');
+                if (!modalEl) return;
 
-            const modal = new bootstrap.Modal(modalEl, {
-                backdrop: 'static',
-                keyboard: true,
+                const modal = new bootstrap.Modal(modalEl, {
+                    backdrop: 'static',
+                    keyboard: true,
+                });
+
+                modal.show();
             });
-
-            modal.show();
-        });
         @endif
     </script>
 </body>
+
 </html>
