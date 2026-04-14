@@ -43,9 +43,6 @@ class TimePunchAdjustmentService
         $ordered = [];
         foreach ($sequence as $item) {
             $value = $times[$item['key']] ?? null;
-            if (! $value) {
-                continue;
-            }
 
             $ordered[] = [
                 'action' => $item['action'],
@@ -53,13 +50,13 @@ class TimePunchAdjustmentService
             ];
         }
 
-        for ($i = 1; $i < count($ordered); $i++) {
-            if (! $ordered[$i]['punched_at']->greaterThan($ordered[$i - 1]['punched_at'])) {
-                throw ValidationException::withMessages([
-                    'entry_1' => 'As batidas devem estar em ordem cronologica.',
-                ]);
-            }
-        }
+        // for ($i = 1; $i < count($ordered); $i++) {
+        //     if (! $ordered[$i]['punched_at']->greaterThan($ordered[$i - 1]['punched_at'])) {
+        //         throw ValidationException::withMessages([
+        //             'entry_1' => 'As batidas devem estar em ordem cronologica.',
+        //         ]);
+        //     }
+        // }
 
         DB::transaction(function () use ($companyId, $employee, $baseDate, $ordered, $reason, $actor): void {
             $this->timePunchRepository->deleteByEmployeeDate($employee->id, $baseDate);

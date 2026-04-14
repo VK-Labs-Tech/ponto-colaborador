@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateTimePunchRequest;
 use App\Models\Employee;
 use App\Repositories\Contracts\TimePunchRepositoryInterface;
 use App\Services\TimePunchAdjustmentService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
 
 class TimePunchAdjustmentController extends Controller
 {
@@ -44,23 +47,15 @@ class TimePunchAdjustmentController extends Controller
         ]);
     }
 
-    public function update(Request $request)
+    public function update(UpdateTimePunchRequest $request)
     {
         $companyId = (int) session('company_id');
 
-        $validated = $request->validate([
-            'employee_id' => ['required', 'integer'],
-            'date' => ['required', 'date'],
-            'entry_1' => ['nullable', 'date_format:H:i'],
-            'exit_1' => ['nullable', 'date_format:H:i'],
-            'entry_2' => ['nullable', 'date_format:H:i'],
-            'exit_2' => ['nullable', 'date_format:H:i'],
-            'reason' => ['required', 'string', 'min:5', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         $employee = Employee::query()
             ->where('company_id', $companyId)
-            ->findOrFail((int) $validated['employee_id']);
+            ->findOrFail($validated['employee_id']);
 
         $this->timePunchAdjustmentService->replaceDayPunches(
             companyId: $companyId,
@@ -73,7 +68,7 @@ class TimePunchAdjustmentController extends Controller
                 'exit_2' => $validated['exit_2'] ?? null,
             ],
             reason: (string) $validated['reason'],
-            actor: (string) ($request->user()?->name ?? 'sistema')
+            actor: $request->user()?->id ?? 'system'
         );
 
         return redirect()->route('reports.index', [

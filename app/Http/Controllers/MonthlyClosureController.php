@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MonthlyClosureRequest;
 use App\Services\MonthlyClosureService;
-use Illuminate\Http\Request;
 
 class MonthlyClosureController extends Controller
 {
@@ -11,12 +11,9 @@ class MonthlyClosureController extends Controller
     {
     }
 
-    public function store(Request $request)
+    public function store(MonthlyClosureRequest $request)
     {
-        $validated = $request->validate([
-            'year' => ['required', 'integer', 'min:2000', 'max:2100'],
-            'month' => ['required', 'integer', 'min:1', 'max:12'],
-        ]);
+        $validated = $request->validated();
 
         $companyId = (int) session('company_id');
 

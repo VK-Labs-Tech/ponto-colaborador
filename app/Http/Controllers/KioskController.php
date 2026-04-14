@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\KioskRequest;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Services\TimeTrackingService;
 use Illuminate\Http\Request;
@@ -23,12 +24,9 @@ class KioskController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(KioskRequest $request)
     {
-        $validated = $request->validate([
-            'employee_id' => ['required', 'integer'],
-            'pin' => ['required', 'string', 'min:4', 'max:10'],
-        ]);
+        $validated = $request->validated();
 
         $companyId = (int) session('company_id');
 
