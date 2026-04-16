@@ -15,7 +15,12 @@
                     <tr>
                         <td>{{ $employee->name }}</td>
                         <td>{{ $employee->registration ?: '-' }}</td>
-                        <td>{{ $employee->shift_start->format('H:i') }} - {{ $employee->lunch_start->format('H:i') }} - {{ $employee->lunch_end->format('H:i') }} - {{ $employee->shift_end->format('H:i') }}</td>
+                        <td>
+                            {{ $employee->shift_start?->format('H:i') ?? '--:--' }} -
+                            {{ $employee->lunch_start?->format('H:i') ?? '--:--' }} -
+                            {{ $employee->lunch_end?->format('H:i') ?? '--:--' }} -
+                            {{ $employee->shift_end?->format('H:i') ?? '--:--' }}
+                        </td>
                         <td>
                             @if($employee->is_active)
                                 <span class="badge text-bg-success">Ativo</span>
