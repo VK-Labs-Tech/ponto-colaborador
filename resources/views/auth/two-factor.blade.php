@@ -1,71 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificacao 2FA</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Verificação 2FA</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         body {
             font-family: 'Manrope', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle at 15% 20%, #fde68a 0%, transparent 38%),
-                        radial-gradient(circle at 82% 14%, #7dd3fc 0%, transparent 36%),
-                        linear-gradient(145deg, #111827 0%, #1f2937 35%, #374151 100%);
-        }
-
-        .auth-card {
-            width: min(500px, 92vw);
-            border-radius: 1.25rem;
-            background: rgba(255, 255, 255, 0.96);
-            box-shadow: 0 18px 46px rgba(0, 0, 0, .32);
-            border: 1px solid rgba(255, 255, 255, .28);
-            backdrop-filter: blur(8px);
-        }
-
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            background: #fff7ed;
-            color: #9a3412;
-            font-weight: 700;
-            font-size: .8rem;
-            border-radius: 999px;
-            padding: .35rem .7rem;
         }
     </style>
 </head>
-<body>
-    <section class="auth-card p-4 p-md-5">
-        <span class="pill mb-3"><i class="bi bi-shield-check"></i> Verificacao em duas etapas</span>
-        <h1 class="h4 mb-1 fw-bold">Confirme seu acesso</h1>
-        <p class="text-muted mb-4">Digite o codigo de 6 digitos enviado para o e-mail do administrador.</p>
 
-        <x-flash />
+<body class="bg-light">
 
-        <form action="{{ route('company.2fa.verify') }}" method="POST" class="d-grid gap-3 mb-3">
-            @csrf
-            <div>
-                <label class="form-label">Codigo 2FA</label>
-                <input class="form-control" type="text" name="code" inputmode="numeric" maxlength="6" placeholder="000000" required>
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+
+            {{-- LADO ESQUERDO --}}
+            <div
+                class="col-lg-6 d-none d-lg-flex flex-column justify-content-center align-items-center bg-primary text-white p-5">
+                <div class="text-center">
+                    <h1 class="fw-bold display-5">Segurança Avançada</h1>
+                    <p class="mt-3 opacity-75">
+                        Protegemos o acesso ao sistema com autenticação em duas etapas.
+                    </p>
+
+                    <div class="mt-4">
+                        <i class="bi bi-shield-lock fs-1"></i>
+                    </div>
+                </div>
             </div>
 
-            <button class="btn btn-warning fw-bold" type="submit">Validar codigo</button>
-        </form>
+            {{-- LADO DIREITO --}}
+            <div class="col-lg-6 d-flex align-items-center justify-content-center p-4">
 
-        <form action="{{ route('company.2fa.resend') }}" method="POST" class="d-grid">
-            @csrf
-            <button class="btn btn-outline-secondary" type="submit">Reenviar codigo</button>
-        </form>
-    </section>
+                <div class="w-100" style="max-width: 420px;">
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4 p-md-5">
+
+                            <div class="text-center mb-4">
+                                <span class="badge bg-primary-subtle text-primary mb-3">
+                                    <i class="bi bi-shield-check"></i> Verificação 2FA
+                                </span>
+
+                                <h2 class="fw-bold">Confirme seu acesso</h2>
+                                <p class="text-muted small">
+                                    Digite o código de 6 dígitos enviado ao e-mail
+                                </p>
+                            </div>
+
+                            <x-flash />
+
+                            <form action="{{ route('company.2fa.verify') }}" method="POST" class="d-grid gap-3 mb-3">
+                                @csrf
+
+                                <div class="form-floating text-center">
+                                    <input type="text" name="code"
+                                        class="form-control text-center fs-4 fw-bold tracking-wide" id="code"
+                                        placeholder="000000" inputmode="numeric" maxlength="6" required>
+                                    <label for="code">
+                                        <i class="bi bi-key"></i> Código 2FA
+                                    </label>
+                                </div>
+
+                                <button class="btn btn-primary fw-bold py-2">
+                                    <i class="bi bi-check-circle"></i> Validar código
+                                </button>
+                            </form>
+
+                            <form action="{{ route('company.2fa.resend') }}" method="POST" class="d-grid">
+                                @csrf
+                                <button class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-repeat"></i> Reenviar código
+                                </button>
+                            </form>
+
+                            <div class="text-center mt-4">
+                                <small class="text-muted">
+                                    Não recebeu? Verifique o spam ou aguarde alguns segundos.
+                                </small>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 
     <script>
         window.addEventListener('pageshow', function (event) {
@@ -75,5 +106,7 @@
             }
         });
     </script>
+
 </body>
+
 </html>
