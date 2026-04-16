@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
+        /* body {
             font-family: 'Manrope', sans-serif;
             min-height: 100vh;
             display: grid;
@@ -19,7 +19,7 @@
                         radial-gradient(circle at 88% 10%, #ddd6fe 0%, transparent 35%),
                         linear-gradient(180deg, #fff 0%, #f8f5f1 100%);
             color: #1b2430;
-        }
+        } */
 
         .error-card {
             width: min(620px, 92vw);

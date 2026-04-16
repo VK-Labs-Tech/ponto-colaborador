@@ -13,12 +13,9 @@
         body {
             font-family: 'Manrope', sans-serif;
             min-height: 100vh;
-            display: grid;
-            place-items: center;
-            background: radial-gradient(circle at 12% 15%, #fde68a 0%, transparent 32%),
-                        radial-gradient(circle at 90% 12%, #bae6fd 0%, transparent 35%),
-                        radial-gradient(circle at 22% 88%, #fecdd3 0%, transparent 38%),
-                        linear-gradient(180deg, #fff 0%, #f8f5f1 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             color: #1b2430;
         }
 

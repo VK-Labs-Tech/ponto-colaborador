@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* :root {
+        :root {
             --brand-bg: #f8f5f1;
             --brand-text: #1b2430;
             --brand-accent: #d97706;
@@ -20,7 +20,7 @@
             --brand-soft: #fff7ed;
             --brand-card: #ffffff;
             --brand-muted: #667085;
-        } */
+        }
 
         body {
             font-family: 'Manrope', sans-serif;
@@ -90,11 +90,14 @@
         }
 
         .table tbody tr {
+            border-radius: .75rem;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
             transition: transform .2s ease, box-shadow .2s ease;
         }
 
         .table tbody tr:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         .form-control,
