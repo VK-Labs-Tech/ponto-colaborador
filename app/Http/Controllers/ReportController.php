@@ -28,16 +28,21 @@ class ReportController extends Controller
         $to = Carbon::parse($request->input('to', now()->toDateString()))->endOfDay();
         $employeeId = $request->filled('employee_id') ? (int) $request->input('employee_id') : null;
 
-        $report = $this->reportService->buildMirror($companyId, $from, $to, $employeeId);
+        $snapshot = $this->reportService->createSnapshot($companyId, $from, $to, $employeeId);
 
         return view('reports.index', [
-            'report' => $report,
+            'report' => [
+                'rows' => $snapshot->rows,
+                'punch_rows' => $snapshot->punch_rows,
+                'totals' => $snapshot->totals,
+            ],
             'employees' => $this->employeeRepository->listActiveByCompany($companyId),
             'filters' => [
                 'from' => $from->toDateString(),
                 'to' => $to->toDateString(),
                 'employee_id' => $employeeId,
             ],
+            'snapshot' => $snapshot,
         ]);
     }
 
@@ -55,14 +60,19 @@ class ReportController extends Controller
         $to = Carbon::parse($request->input('to', now()->toDateString()))->endOfDay();
         $employeeId = $request->filled('employee_id') ? (int) $request->input('employee_id') : null;
 
-        $report = $this->reportService->buildMirror($companyId, $from, $to, $employeeId);
+        $snapshotId = $request->filled('snapshot_id') ? (int) $request->input('snapshot_id') : null;
+        $snapshot = $snapshotId
+            ? $this->reportService->getSnapshot($companyId, $snapshotId)
+            : null;
+        $snapshot ??= $this->reportService->createSnapshot($companyId, $from, $to, $employeeId);
 
         $pdf = Pdf::loadView('reports.pdf', [
-            'rows' => $report['punch_rows'],
-            'totals' => $report['totals'],
+            'rows' => $snapshot->punch_rows,
+            'totals' => $snapshot->totals,
             'companyName' => session('company_name'),
             'from' => $from,
             'to' => $to,
+            'snapshot' => $snapshot,
         ]);
 
         return $pdf->download('espelho-ponto.pdf');
@@ -82,8 +92,29 @@ class ReportController extends Controller
         $to = Carbon::parse($request->input('to', now()->toDateString()))->endOfDay();
         $employeeId = $request->filled('employee_id') ? (int) $request->input('employee_id') : null;
 
-        $report = $this->reportService->buildMirror($companyId, $from, $to, $employeeId);
+        $snapshotId = $request->filled('snapshot_id') ? (int) $request->input('snapshot_id') : null;
+        $snapshot = $snapshotId
+            ? $this->reportService->getSnapshot($companyId, $snapshotId)
+            : null;
+        $snapshot ??= $this->reportService->createSnapshot($companyId, $from, $to, $employeeId);
 
-        return Excel::download(new MirrorReportExport($report['punch_rows']), 'espelho-ponto.xlsx');
+        return Excel::download(new MirrorReportExport($snapshot->punch_rows, $snapshot), 'espelho-ponto.xlsx');
+    }
+
+    public function acknowledgeMirror(Request $request)
+    {
+        $companyId = (int) session('company_id');
+        $snapshot = $this->reportService->getSnapshot($companyId, (int) $request->input('snapshot_id'));
+
+        if (! $snapshot) {
+            return back()->withErrors(['snapshot_id' => 'Snapshot de espelho não encontrado.']);
+        }
+
+        $snapshot->update([
+            'signed_by' => $request->user()?->id,
+            'signed_at' => now(),
+        ]);
+
+        return back()->with('status', 'Ciência do espelho registrada com sucesso.');
     }
 }

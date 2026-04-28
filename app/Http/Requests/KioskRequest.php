@@ -25,6 +25,8 @@ class KioskRequest extends FormRequest
         return [
             'employee_id' => ['required', 'integer'],
             'pin' => ['required', 'string', 'min:4', 'max:10'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
     }
 

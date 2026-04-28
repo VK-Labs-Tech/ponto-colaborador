@@ -14,12 +14,19 @@ class TimePunch extends Model
         'punched_at',
         'origin',
         'note',
+        'adjustment_batch',
+        'ip_address',
+        'latitude',
+        'longitude',
+        'device_fingerprint',
     ];
 
     protected function casts(): array
     {
         return [
             'punched_at' => 'datetime',
+            'latitude' => 'float',
+            'longitude' => 'float',
         ];
     }
 

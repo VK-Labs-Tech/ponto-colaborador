@@ -21,7 +21,7 @@ class TimeTrackingService
     ) {
     }
 
-    public function registerPunch(int $companyId, int $employeeId, string $pin): TimePunch
+    public function registerPunch(int $companyId, int $employeeId, string $pin, array $context = []): TimePunch
     {
         $employee = $this->employeeRepository->findById($employeeId);
 
@@ -41,7 +41,7 @@ class TimeTrackingService
             $this->employeeRepository->updatePin($employee->id, PinHasher::hash($pin));
         }
 
-        $now = Carbon::now();
+        $now = Carbon::now('UTC');
         if ($this->monthlyClosureService->isClosed($companyId, $now)) {
             throw ValidationException::withMessages([
                 'date' => 'Nao e permitido lancar ponto em mes fechado.',
@@ -57,12 +57,22 @@ class TimeTrackingService
         $lastPunch = $todayPunches->last();
         $action = $lastPunch?->action === 'in' ? 'out' : 'in';
 
+        if ($lastPunch && $lastPunch->punched_at->diffInSeconds($now) < 60) {
+            throw ValidationException::withMessages([
+                'employee_id' => 'Nova marcacao bloqueada por janela de segurança de 60 segundos.',
+            ]);
+        }
+
         $punch = $this->timePunchRepository->create([
             'company_id' => $companyId,
             'employee_id' => $employee->id,
             'action' => $action,
             'punched_at' => $now,
             'origin' => 'kiosk',
+            'ip_address' => $context['ip_address'] ?? null,
+            'latitude' => $context['latitude'] ?? null,
+            'longitude' => $context['longitude'] ?? null,
+            'device_fingerprint' => $context['device_fingerprint'] ?? null,
         ]);
 
         $this->auditLogService->log(
@@ -75,7 +85,13 @@ class TimeTrackingService
                 'employee_id' => $employee->id,
                 'action' => $action,
                 'punched_at' => $now->toDateTimeString(),
-            ]
+                'ip_address' => $context['ip_address'] ?? null,
+                'latitude' => $context['latitude'] ?? null,
+                'longitude' => $context['longitude'] ?? null,
+            ],
+            actorId: auth()->id(),
+            actorType: 'user',
+            actorRole: auth()->user()?->role
         );
 
         return $punch;
