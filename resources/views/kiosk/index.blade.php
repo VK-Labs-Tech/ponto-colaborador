@@ -4,7 +4,7 @@
         subtitle="Selecione o colaborador, informe o PIN e registre a batida"
     />
 
-    <section class="surface-card p-4 mb-4">
+    <section class="container-fluid p-4 shadow-lg border rounded-4 bg-light">
         <h2 class="h4 mb-3">Registro de ponto por PIN</h2>
 
         <form method="POST" action="{{ route('kiosk.punch') }}" class="row g-3 align-items-end">
@@ -26,7 +26,7 @@
             </div>
 
             <div class="col-12 col-md-2 d-grid">
-                <button class="btn btn-brand" type="submit">Registrar</button>
+                <button class="btn btn-primary" type="submit">Registrar</button>
             </div>
         </form>
     </section>

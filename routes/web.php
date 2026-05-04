@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\CompanyAuthController;
 use App\Http\Controllers\Admin\CompanyManagementController;
 use App\Http\Controllers\CompanyUserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EditEmployeesController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\KioskController;
 use App\Http\Controllers\MonthlyClosureController;
@@ -58,6 +59,13 @@ Route::middleware(['auth', 'company.auth'])->group(function () {
     Route::post('/employees', [EmployeeController::class, 'store'])
         ->middleware('role:company_admin')
         ->name('employees.store');
+
+    Route::get('/employees/{employee}/edit', [EditEmployeesController::class, 'edit'])
+        ->middleware('role:company_admin')
+        ->name('employees.edit');
+    Route::put('/employees/{employee}', [EditEmployeesController::class, 'update'])
+        ->middleware('role:company_admin')
+        ->name('employees.update');
 
     Route::get('/company-users', [CompanyUserController::class, 'index'])
         ->middleware('role:company_admin')

@@ -16,6 +16,7 @@ return [
     'company_editor' => [
         ['label' => 'Dashboard', 'route' => 'dashboard.index', 'icon' => 'bi-speedometer2'],
         ['label' => 'Relatórios', 'route' => 'reports.index', 'icon' => 'bi-bar-chart'],
+        ['label' => 'Funcionários', 'route' => 'employees.index', 'icon' => 'bi-people'], 
     ],
 
     'company_operator' => [
