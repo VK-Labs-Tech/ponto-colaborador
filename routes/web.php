@@ -42,15 +42,15 @@ Route::middleware(['auth', 'role:saas_admin'])->prefix('admin')->name('admin.')-
 Route::middleware(['auth', 'company.auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->middleware('role:company_admin,company_editor')
+        ->middleware('role:admin,gestor')
         ->name('dashboard.index');
 
     Route::get('/kiosk', [KioskController::class, 'index'])
-        ->middleware('role:company_admin,company_operator')
+        ->middleware('role:admin,colaborador')
         ->name('kiosk.index');
     Route::post('/kiosk/punch', [KioskController::class, 'store'])
         ->middleware('throttle:kiosk-punch')
-        ->middleware('role:company_admin,company_operator')
+        ->middleware('role:admin,colaborador')
         ->name('kiosk.punch');
 
     Route::get('/employees', [EmployeeController::class, 'index'])
@@ -75,19 +75,22 @@ Route::middleware(['auth', 'company.auth'])->group(function () {
         ->name('company-users.store');
 
     Route::get('/reports', [ReportController::class, 'index'])
-        ->middleware('role:company_admin,company_editor,company_operator')
+        ->middleware('role:admin,gestor,colaborador')
         ->name('reports.index');
     Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])
-        ->middleware('role:company_admin,company_editor,company_operator')
+        ->middleware('role:admin,gestor,colaborador')
         ->name('reports.export.pdf');
     Route::get('/reports/export/excel', [ReportController::class, 'exportExcel'])
-        ->middleware('role:company_admin,company_editor,company_operator')
+        ->middleware('role:admin,gestor,colaborador')
         ->name('reports.export.excel');
+    Route::post('/reports/acknowledge', [ReportController::class, 'acknowledgeMirror'])
+        ->middleware('role:admin,gestor,colaborador')
+        ->name('reports.acknowledge');
     Route::get('/reports/adjust', [TimePunchAdjustmentController::class, 'edit'])
-        ->middleware('role:company_editor')
+        ->middleware('role:gestor')
         ->name('reports.adjust.edit');
     Route::post('/reports/adjust', [TimePunchAdjustmentController::class, 'update'])
-        ->middleware('role:company_editor')
+        ->middleware('role:gestor')
         ->name('reports.adjust.update');
 
     Route::post('/monthly-closures', [MonthlyClosureController::class, 'store'])

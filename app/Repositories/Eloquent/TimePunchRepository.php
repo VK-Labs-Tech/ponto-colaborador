@@ -49,12 +49,4 @@ class TimePunchRepository implements TimePunchRepositoryInterface
             ->whereDate('punched_at', $date->toDateString())
             ->exists();
     }
-
-    public function deleteByEmployeeDate(int $employeeId, CarbonInterface $date): void
-    {
-        TimePunch::query()
-            ->where('employee_id', $employeeId)
-            ->whereDate('punched_at', $date->toDateString())
-            ->delete();
-    }
 }

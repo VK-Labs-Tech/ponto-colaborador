@@ -68,7 +68,9 @@ class TimePunchAdjustmentController extends Controller
                 'exit_2' => $validated['exit_2'] ?? null,
             ],
             reason: (string) $validated['reason'],
-            actor: $request->user()?->id ?? 'system'
+            actor: (string) ($request->user()?->email ?? 'system'),
+            actorId: $request->user()?->id,
+            actorRole: $request->user()?->role
         );
 
         return redirect()->route('reports.index', [

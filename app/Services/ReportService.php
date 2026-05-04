@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\MirrorSnapshot;
 use App\Repositories\Contracts\TimePunchRepositoryInterface;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -19,6 +20,8 @@ class ReportService
         if ($employeeId) {
             $punches = $punches->where('employee_id', $employeeId)->values();
         }
+
+        $punches = $this->resolveEffectivePunches($punches);
 
         $grouped = $punches->groupBy(function ($punch) {
             return $punch->employee_id.'|'.$punch->punched_at->toDateString();
@@ -45,6 +48,9 @@ class ReportService
                     'action' => $punch->action,
                     'action_label' => $punch->action === 'in' ? 'Entrada' : 'Saida',
                     'is_late' => $isLate,
+                    'origin' => $punch->origin,
+                    'is_adjustment' => $punch->origin === 'manual_adjustment',
+                    'note' => $punch->note,
                 ];
             })
             ->all();
@@ -107,6 +113,50 @@ class ReportService
         ];
     }
 
+    public function createSnapshot(int $companyId, CarbonInterface $from, CarbonInterface $to, ?int $employeeId = null): MirrorSnapshot
+    {
+        $report = $this->buildMirror($companyId, $from, $to, $employeeId);
+        $payload = [
+            'rows' => $report['rows'],
+            'punch_rows' => $report['punch_rows'],
+            'totals' => $report['totals'],
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
+            'employee_id' => $employeeId,
+        ];
+
+        $hash = hash('sha256', json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+        $latest = MirrorSnapshot::query()
+            ->where('company_id', $companyId)
+            ->whereDate('period_from', $from->toDateString())
+            ->whereDate('period_to', $to->toDateString())
+            ->where('employee_id', $employeeId)
+            ->latest('id')
+            ->first();
+
+        $version = ($latest?->content_hash === $hash) ? $latest->version : (($latest?->version ?? 0) + 1);
+
+        return MirrorSnapshot::query()->create([
+            'company_id' => $companyId,
+            'period_from' => $from->toDateString(),
+            'period_to' => $to->toDateString(),
+            'employee_id' => $employeeId,
+            'rows' => $report['rows'],
+            'punch_rows' => $report['punch_rows'],
+            'totals' => $report['totals'],
+            'content_hash' => $hash,
+            'version' => $version,
+        ]);
+    }
+
+    public function getSnapshot(int $companyId, int $snapshotId): ?MirrorSnapshot
+    {
+        return MirrorSnapshot::query()
+            ->where('company_id', $companyId)
+            ->find($snapshotId);
+    }
+
     public function minutesToHuman(int $minutes): string
     {
         $hours = intdiv($minutes, 60);
@@ -136,5 +186,33 @@ class ReportService
         }
 
         return $minutes;
+    }
+
+    private function resolveEffectivePunches($punches)
+    {
+        return $punches
+            ->groupBy(fn ($punch) => $punch->employee_id.'|'.$punch->punched_at->toDateString())
+            ->flatMap(function ($dayPunches) {
+                $adjustmentPunches = $dayPunches
+                    ->where('origin', 'manual_adjustment')
+                    ->sortByDesc('created_at')
+                    ->values();
+
+                if ($adjustmentPunches->isEmpty()) {
+                    return $dayPunches->sortBy('punched_at')->values();
+                }
+
+                $latestBatch = $adjustmentPunches->first()->adjustment_batch;
+                if ($latestBatch) {
+                    return $adjustmentPunches
+                        ->where('adjustment_batch', $latestBatch)
+                        ->sortBy('punched_at')
+                        ->values();
+                }
+
+                return $adjustmentPunches->sortBy('punched_at')->values();
+            })
+            ->sortBy('punched_at')
+            ->values();
     }
 }

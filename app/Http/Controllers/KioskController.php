@@ -33,7 +33,13 @@ class KioskController extends Controller
         $punch = $this->timeTrackingService->registerPunch(
             companyId: $companyId,
             employeeId: (int) $validated['employee_id'],
-            pin: (string) $validated['pin']
+            pin: (string) $validated['pin'],
+            context: [
+                'ip_address' => $request->ip(),
+                'latitude' => $validated['latitude'] ?? null,
+                'longitude' => $validated['longitude'] ?? null,
+                'device_fingerprint' => $request->userAgent(),
+            ]
         );
 
         $actionLabel = $punch->action === 'in' ? 'Entrada' : 'Saida';

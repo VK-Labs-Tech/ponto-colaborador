@@ -14,7 +14,11 @@
 </head>
 <body>
     <h1>Espelho de ponto</h1>
-    <p class="meta">Empresa: {{ $companyName }} | Periodo: {{ $from->format('d/m/Y') }} a {{ $to->format('d/m/Y') }}</p>
+    <p class="meta">
+        Empresa: {{ $companyName }} | Periodo: {{ $from->format('d/m/Y') }} a {{ $to->format('d/m/Y') }}<br>
+        Snapshot: #{{ $snapshot->id }} | Hash: {{ $snapshot->content_hash }} | Versao: {{ $snapshot->version }}<br>
+        Ciencia do colaborador: {{ $snapshot->signed_at ? $snapshot->signed_at->format('d/m/Y H:i') : 'Pendente' }}
+    </p>
 
     <table>
         <thead>
@@ -24,6 +28,8 @@
                 <th>Hora</th>
                 <th>Acao</th>
                 <th>Atraso</th>
+                <th>Ajuste</th>
+                <th>Justificativa</th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +40,8 @@
                     <td>{{ $row['time'] }}</td>
                     <td>{{ $row['action_label'] }}</td>
                     <td>{{ $row['is_late'] ? 'Sim' : 'Nao' }}</td>
+                    <td>{{ $row['is_adjustment'] ? 'Sim' : 'Nao' }}</td>
+                    <td>{{ $row['note'] ?: '-' }}</td>
                 </tr>
             @endforeach
         </tbody>

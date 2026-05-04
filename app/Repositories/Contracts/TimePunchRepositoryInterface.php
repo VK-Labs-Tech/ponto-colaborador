@@ -17,6 +17,4 @@ interface TimePunchRepositoryInterface
     public function firstPunchOfDay(int $employeeId, CarbonInterface $day): ?TimePunch;
 
     public function hasPunchOnDate(int $employeeId, CarbonInterface $date): bool;
-
-    public function deleteByEmployeeDate(int $employeeId, CarbonInterface $date): void;
 }

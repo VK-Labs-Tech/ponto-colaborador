@@ -1,6 +1,6 @@
 <x-layouts.app title="Relatorios">
     @php
-        $canAdjustPunch = auth()->check() && auth()->user()->role === 'company_editor';
+        $canAdjustPunch = auth()->check() && in_array(auth()->user()->role, ['company_editor', 'company_admin'], true);
         $canCloseMonth = auth()->check() && auth()->user()->role === 'company_admin';
     @endphp
 
@@ -16,9 +16,21 @@
             <h2 class="h5 mb-0">Espelho de ponto</h2>
 
             <div class="d-flex gap-2">
-                <a class="btn btn-outline-brand btn-sm" href="{{ route('reports.export.pdf', request()->query()) }}"><i class="bi bi-file-earmark-pdf"></i> Exportar PDF</a>
-                <a class="btn btn-outline-success btn-sm rounded-3" href="{{ route('reports.export.excel', request()->query()) }}"><i class="bi bi-file-earmark-excel"></i> Exportar Excel</a>
+                <a class="btn btn-outline-brand btn-sm" href="{{ route('reports.export.pdf', array_merge(request()->query(), ['snapshot_id' => $snapshot->id])) }}"><i class="bi bi-file-earmark-pdf"></i> Exportar PDF</a>
+                <a class="btn btn-outline-success btn-sm rounded-3" href="{{ route('reports.export.excel', array_merge(request()->query(), ['snapshot_id' => $snapshot->id])) }}"><i class="bi bi-file-earmark-excel"></i> Exportar Excel</a>
             </div>
+        </div>
+
+        <div class="alert alert-light border mb-3">
+            <strong>Snapshot oficial:</strong> #{{ $snapshot->id }} |
+            <strong>Hash:</strong> <code>{{ $snapshot->content_hash }}</code> |
+            <strong>Versao:</strong> {{ $snapshot->version }} |
+            <strong>Ciencia:</strong> {{ $snapshot->signed_at ? $snapshot->signed_at->format('d/m/Y H:i') : 'Pendente' }}
+            <form method="POST" action="{{ route('reports.acknowledge') }}" class="d-inline ms-2">
+                @csrf
+                <input type="hidden" name="snapshot_id" value="{{ $snapshot->id }}">
+                <button class="btn btn-sm btn-outline-dark" type="submit">Registrar ciencia</button>
+            </form>
         </div>
 
         <div class="table-responsive">
@@ -30,6 +42,7 @@
                         <th>Hora</th>
                         <th>Acao</th>
                         <th>Atraso</th>
+                        <th>Ajuste</th>
                         @if($canAdjustPunch)
                             <th>Acoes</th>
                         @endif
@@ -49,6 +62,13 @@
                                     <span class="badge text-bg-success">Nao</span>
                                 @endif
                             </td>
+                            <td>
+                                @if($row['is_adjustment'])
+                                    <span class="badge text-bg-info">Manual</span>
+                                @else
+                                    <span class="badge text-bg-secondary">Original</span>
+                                @endif
+                            </td>
                             @if($canAdjustPunch)
                                 <td>
                                     <a class="btn btn-sm btn-outline-brand" href="{{ route('reports.adjust.edit', ['employee_id' => $row['employee_id'], 'date' => $row['date']]) }}">
@@ -59,7 +79,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $canAdjustPunch ? 6 : 5 }}" class="text-center text-muted">Nenhum registro encontrado para o filtro informado.</td>
+                            <td colspan="{{ $canAdjustPunch ? 7 : 6 }}" class="text-center text-muted">Nenhum registro encontrado para o filtro informado.</td>
                         </tr>
                     @endforelse
                 </tbody>
