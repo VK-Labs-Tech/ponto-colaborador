@@ -36,11 +36,8 @@ class TimeTrackingService
                 'pin' => 'PIN invalido.',
             ]);
         }
-
-        if (PinHasher::needsUpgrade((string) $employee->pin)) {
-            $this->employeeRepository->updatePin($employee->id, PinHasher::hash($pin));
-        }
-
+        if (PinHasher::needsUpgrade((string) $employee->pin)) $this->employeeRepository->updatePin($employee->id, PinHasher::hash($pin));
+    
         $timezone = 'America/Cuiaba';
         $now = Carbon::now($timezone);
         if ($this->monthlyClosureService->isClosed($companyId, $now)) {
