@@ -51,4 +51,16 @@ class EmployeeRepository implements EmployeeRepositoryInterface
             ->whereKey($employeeId)
             ->update(['pin' => $pin]);
     }
+
+    public function edit(array $data, int $companyId, string $actor): Employee
+    {
+        $employee = Employee::query()
+            ->where('company_id', $companyId)
+            ->whereKey($data['id'])
+            ->firstOrFail();
+
+        $employee->update($data);
+
+        return $employee;
+    }
 }

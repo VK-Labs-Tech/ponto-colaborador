@@ -35,9 +35,9 @@
                                     <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-sm btn-primary">
                                         Editar
                                     </a>
-                                    <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este funcionário?')">
+                                    {{-- <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este funcionário?')">
                                         Excluir
-                                    </a>
+                                    </a> --}}
                                 </td>
                             </tr>
                         @empty

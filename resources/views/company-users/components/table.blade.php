@@ -1,5 +1,4 @@
 @props(['users'])
-
 <div class="container-fluid p-0">
   <div class="row">
     <div class="col">
@@ -10,6 +9,7 @@
               <th>Nome</th>
               <th>E-mail</th>
               <th>Perfil</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -23,13 +23,18 @@
                   @elseif($user->role === 'company_operator')
                     <span class="badge text-bg-success">Operador</span>
                   @else
-                    <span class="badge text-bg-warning">Editor de ponto</span>
+                    <span class="badge text-bg-secondary">Editor de ponto</span>
                   @endif
+                </td>
+                <td>
+                  <a href="{{ route('company-users.edit', $user->id) }}" class="btn btn-sm btn-warning">
+                    Editar
+                  </a>
                 </td>
               </tr>
             @empty
               <tr>
-                <td colspan="3" class="text-center text-muted">Nenhum usuario cadastrado.</td>
+                <td colspan="4" class="text-center text-muted">Nenhum usuario cadastrado.</td>
               </tr>
             @endforelse
           </tbody>

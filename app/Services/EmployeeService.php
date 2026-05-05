@@ -19,6 +19,28 @@ class EmployeeService
         return $this->employeeRepository->listByCompany($companyId);
     }
 
+    public function edit(array $data, string $actor, int $companyId): void{
+
+        $edit = $this->employeeRepository->edit($data, $companyId, $actor);
+
+         $this->auditLogService->log(
+            companyId: $companyId,
+            actor: $actor,
+            event: 'employee_edited',
+            entityType: 'employee',
+            entityId: $edit->id,
+            payload: [
+                'name' => $edit->name,
+                'registration' => $edit->registration,
+                'shift_start' => $edit->shift_start,
+                'lunch_start' => $edit->lunch_start,
+                'lunch_end' => $edit->lunch_end,
+                'shift_end' => $edit->shift_end,
+            ]
+        );
+
+    }
+
     public function create(int $companyId, array $data, string $actor): void
     {
         $employee = $this->employeeRepository->create([

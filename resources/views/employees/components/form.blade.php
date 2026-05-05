@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="col-12 d-grid">
-                    <button class="btn btn-brand" type="submit">Salvar funcionario</button>
+                    <button class="btn btn-primary" type="submit">Salvar funcionario</button>
                 </div>
             </form>
         </div>

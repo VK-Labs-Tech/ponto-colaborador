@@ -14,6 +14,35 @@ class CompanyUserController extends Controller
     {
     }
 
+    public function edit(User $user) {
+        return view('company-users.edit', compact('user'));
+    }
+
+    public function update(Request $request, User $user) {
+        $companyId = (int) session('company_id');
+
+        if ($user->company_id !== $companyId) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:150'],
+            'email' => ['required', 'email', 'max:150', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'min:6', 'max:100'],
+            'role' => ['required', 'in:company_editor,company_admin,company_operator'],
+        ]);
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        if (! empty($validated['password'])) {
+            $user->password = $validated['password'];
+        }
+        $user->role = $validated['role'];
+        $user->save();
+
+        return redirect()->route('company-users.index')->with('status', 'Usuario da empresa atualizado com sucesso.');
+    }
+
     public function index()
     {
         $companyId = (int) session('company_id');

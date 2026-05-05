@@ -73,6 +73,12 @@ Route::middleware(['auth', 'company.auth'])->group(function () {
     Route::post('/company-users', [CompanyUserController::class, 'store'])
         ->middleware('role:company_admin')
         ->name('company-users.store');
+    Route::get('/company-users/{user}/edit', [CompanyUserController::class, 'edit'])
+        ->middleware('role:company_admin')
+        ->name('company-users.edit');
+    Route::put('/company-users/{user}', [CompanyUserController::class, 'update'])
+        ->middleware('role:company_admin')
+        ->name('company-users.update');
 
     Route::get('/reports', [ReportController::class, 'index'])
         ->middleware('role:admin,gestor,colaborador')
