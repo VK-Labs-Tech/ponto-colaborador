@@ -43,7 +43,6 @@ class TimeTrackingService
 
         $timezone = 'America/Cuiaba';
         $now = Carbon::now($timezone);
-        $nowUtc = $now->copy()->utc();
         if ($this->monthlyClosureService->isClosed($companyId, $now)) {
             throw ValidationException::withMessages([
                 'date' => 'Nao e permitido lancar ponto em mes fechado.',
@@ -75,7 +74,7 @@ class TimeTrackingService
             'company_id' => $companyId,
             'employee_id' => $employee->id,
             'action' => $action,
-            'punched_at' => $nowUtc,
+            'punched_at' => $now,
             'origin' => 'kiosk',
             'ip_address' => $context['ip_address'] ?? null,
             'latitude' => $context['latitude'] ?? null,
@@ -92,7 +91,7 @@ class TimeTrackingService
                 payload: [
                     'employee_id' => $employee->id,
                     'action'      => $action,
-                    'punched_at'  => $nowUtc->toDateTimeString(),
+                    'punched_at'  => $now->toDateTimeString(),
                     'ip_address'  => $context['ip_address'] ?? null,
                     'latitude'    => $context['latitude'] ?? null,
                     'longitude'   => $context['longitude'] ?? null,
