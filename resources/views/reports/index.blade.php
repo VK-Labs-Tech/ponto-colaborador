@@ -11,7 +11,7 @@
 
     <x-report-filters :employees="$employees" :filters="$filters" />
 
-    <section class="surface-card p-3 p-md-4 mb-4">
+    <section class="container-fluid p-4 shadow-lg border rounded-4 bg-light p-md-4 mb-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
             <h2 class="h5 mb-0">Espelho de ponto</h2>
 
