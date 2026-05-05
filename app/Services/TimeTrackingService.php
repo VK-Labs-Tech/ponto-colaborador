@@ -41,7 +41,9 @@ class TimeTrackingService
             $this->employeeRepository->updatePin($employee->id, PinHasher::hash($pin));
         }
 
-        $now = Carbon::now('UTC');
+        $timezone = 'America/Cuiaba';
+        $now = Carbon::now($timezone);
+        $nowUtc = $now->copy()->utc();
         if ($this->monthlyClosureService->isClosed($companyId, $now)) {
             throw ValidationException::withMessages([
                 'date' => 'Nao e permitido lancar ponto em mes fechado.',
@@ -63,11 +65,17 @@ class TimeTrackingService
             ]);
         }
 
+        $todayPunches = $this->timePunchRepository->listByEmployeePeriod(
+            employeeId: $employee->id,
+            from: $now->copy()->startOfDay()->utc(),  
+            to: $now->copy()->endOfDay()->utc()       
+        );
+
         $punch = $this->timePunchRepository->create([
             'company_id' => $companyId,
             'employee_id' => $employee->id,
             'action' => $action,
-            'punched_at' => $now,
+            'punched_at' => $nowUtc,
             'origin' => 'kiosk',
             'ip_address' => $context['ip_address'] ?? null,
             'latitude' => $context['latitude'] ?? null,
@@ -75,24 +83,24 @@ class TimeTrackingService
             'device_fingerprint' => $context['device_fingerprint'] ?? null,
         ]);
 
-        $this->auditLogService->log(
-            companyId: $companyId,
-            actor: session('company_name', 'empresa'),
-            event: 'time_punch_created',
-            entityType: 'time_punch',
-            entityId: $punch->id,
-            payload: [
-                'employee_id' => $employee->id,
-                'action' => $action,
-                'punched_at' => $now->toDateTimeString(),
-                'ip_address' => $context['ip_address'] ?? null,
-                'latitude' => $context['latitude'] ?? null,
-                'longitude' => $context['longitude'] ?? null,
-            ],
-            actorId: auth()->id(),
-            actorType: 'user',
-            actorRole: auth()->user()?->role
-        );
+            $this->auditLogService->log(
+                companyId: $companyId,
+                actor: 'kiosk',
+                event: 'time_punch_created',
+                entityType: 'time_punch',
+                entityId: $punch->id,
+                payload: [
+                    'employee_id' => $employee->id,
+                    'action'      => $action,
+                    'punched_at'  => $nowUtc->toDateTimeString(),
+                    'ip_address'  => $context['ip_address'] ?? null,
+                    'latitude'    => $context['latitude'] ?? null,
+                    'longitude'   => $context['longitude'] ?? null,
+                ],
+                actorId:   $employee->id,
+                actorType: 'employee',
+                actorRole: null
+            );
 
         return $punch;
     }
