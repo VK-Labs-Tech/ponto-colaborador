@@ -29,8 +29,11 @@ class TimeTrackingService
             throw ValidationException::withMessages([
                 'employee_id' => 'Colaborador invalido para esta empresa.',
             ]);
+        } else if (!$employeeId || $pin) {
+            throw ValidationException::withMessages([
+                'employee_id' => 'Colaborador e PIN são obrigatórios.',
+            ]);
         }
-
         if (! PinHasher::verify($pin, (string) $employee->pin)) {
             throw ValidationException::withMessages([
                 'pin' => 'PIN invalido.',
