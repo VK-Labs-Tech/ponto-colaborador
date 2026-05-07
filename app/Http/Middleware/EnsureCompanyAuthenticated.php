@@ -21,14 +21,9 @@ class EnsureCompanyAuthenticated
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-
-        if (! $user) {
-            return redirect()->route('company.login');
-        }
-
-        if (! in_array($user->role, ['company_admin', 'company_editor', 'company_operator'], true) || ! $user->company_id) {
-            abort(403);
-        }
+        if (! $user) return redirect()->route('company.login');
+        if (! in_array($user->role, ['company_admin', 'company_editor', 'company_operator'], true) || ! $user->company_id) abort(403);
+        
 
         if (! $user->company || ! $this->subscriptionService->canAccess($user->company)) {
             return response()->view('billing.blocked', [
@@ -41,7 +36,6 @@ class EnsureCompanyAuthenticated
             $request->session()->put('company_id', $user->company_id);
             $request->session()->put('company_name', $user->company?->name ?? 'Empresa');
         }
-
         return $next($request);
     }
 }
