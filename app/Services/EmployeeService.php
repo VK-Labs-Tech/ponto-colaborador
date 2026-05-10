@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Employee;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Support\PinHasher;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class EmployeeService
 {
@@ -16,11 +18,18 @@ class EmployeeService
 
     public function listByCompany(int $companyId): Collection
     {
-        return $this->employeeRepository->listByCompany($companyId);
+        $dados = $this->employeeRepository->listByCompany($companyId);
+        // dd($dados);
+        return $dados;
     }
 
     public function edit(array $data, string $actor, int $companyId): void{
 
+        if (Employee::where('registration', $data['registration'])->exists()) {
+             throw ValidationException::withMessages([
+                'registration' => 'A matricula informada já existe.',
+            ]);
+        }
         $edit = $this->employeeRepository->edit($data, $companyId, $actor);
 
          $this->auditLogService->log(

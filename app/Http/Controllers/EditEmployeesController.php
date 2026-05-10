@@ -18,6 +18,7 @@ class EditEmployeesController extends Controller
 
     public function update(Request $request, Employee $employee)
     {
+       
         $validated = $request->validate([
             'name'         => ['required', 'string', 'min:3', 'max:120'],
             'registration' => ['nullable', 'string', 'max:40'],
